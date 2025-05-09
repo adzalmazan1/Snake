@@ -86,8 +86,16 @@ public class GamePanel extends JPanel {
         g2D.setColor(new Color(75, 122, 242));
         g2D.fillRect(snakeHead.x, snakeHead.y, snakeHead.width, snakeHead.height);
 
-        for(Tile i : snakeBody) {
-            g2D.fillRect(snakeHead.x - sPanel.tileSize, snakeHead.y - sPanel.tileSize, i.width, i.height);
+        if(detectCollission(snakeHead, food)) {
+            // System.out.println("Added to snakeBody");
+            snakeBody.add(new Tile(food.x, food.y, sPanel.tileSize, sPanel.tileSize));
+            displaceFood();
+        }
+
+        // to draw snakeBody
+        for(int i = 0; i < snakeBody.size(); i++) {
+            Tile snakePart = snakeBody.get(i);
+            g2D.fillRect(snakePart.x, snakePart.y,snakePart.height, snakePart.height);
         }
 
         // draw food
@@ -96,7 +104,7 @@ public class GamePanel extends JPanel {
     }
 
     public void update() {
-        // update code here
+        // snakeHead movement
         if(eventH.up || eventH.down) {
             snakeHead.y += eventH.velocityY;
         }
@@ -105,25 +113,30 @@ public class GamePanel extends JPanel {
             snakeHead.x += eventH.velocityX;
         }
 
-        for(Tile i : snakeBody) {
-            i.x = snakeHead.x;
-            i.y = snakeHead.y;
+        /* 
+        for(int i = snakeBody.size() - 1; i >= 0; i--) {
+            Tile snakePart = snakeBody.get(i);
+            if(i == 0) {
+                snakePart.x = snakeHead.x;
+                snakePart.y = snakeHead.y;
+            }
+            else {
+                Tile prevSnakePart = snakeBody.get(i - 1);
+                snakePart.x = prevSnakePart.x;
+                snakePart.y = prevSnakePart.y;
+            }
         }
-
-        if(detectCollission(snakeHead, food)) {
-            randomX = random.nextInt(sPanel.cols) * sPanel.tileSize; // grid-aligned
-            randomY = random.nextInt(sPanel.rows) * sPanel.tileSize;
-
-            food.x = randomX;
-            food.y = randomY;
-
-            addSnakeBody();
-        }
+        */
     }
 
-    public void addSnakeBody() {
-        snakeBody.add(new Tile(10, 10, sPanel.tileSize, sPanel.tileSize));
+    public void displaceFood() {
+        randomX = random.nextInt(sPanel.cols) * sPanel.tileSize;
+        randomY = random.nextInt(sPanel.rows) * sPanel.tileSize;
+
+        food.x = randomX;
+        food.y = randomY;
     }
+    
 
     // collission detection formula
     public boolean detectCollission(Tile a, Tile b) {
